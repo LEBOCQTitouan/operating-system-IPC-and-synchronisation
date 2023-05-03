@@ -8,23 +8,23 @@ shared_memory get_shared_memory_segment(char *path, size_t size) {
 
     // trying to create a shared memory file
     new_shared_memory.fd = shm_open(path, O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);
-    if (
-        new_shared_memory.fd != EXIT_SUCCESS
-        && errno != EEXIST
-    ) {
-        perror("shm_open (creation)");
-        exit(EXIT_FAILURE);
-    }
-    // trying to open an already existing shared memory
-    new_shared_memory.fd = shm_open(path, O_RDWR, S_IRUSR|S_IWUSR);
-    if (new_shared_memory.fd != EXIT_SUCCESS) {
-        perror("shm_open (opening existing file)");
-        exit(EXIT_FAILURE);
-    }
-    // set the size of the shared memory file to the given length
-    if (ftruncate(new_shared_memory.fd, (off_t)size) != EXIT_SUCCESS) {
-        perror("ftruncate");
-        exit(EXIT_FAILURE);
+    if (new_shared_memory.fd < 0) {
+        if (errno != EEXIST) {
+            perror("shm_open (creation)");
+            exit(EXIT_FAILURE);
+        }
+        // trying to open an already existing shared memory
+        new_shared_memory.fd = shm_open(path, O_RDWR, S_IRUSR|S_IWUSR);
+        if (new_shared_memory.fd < 0) {
+            perror("shm_open (opening existing file)");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        // set the size of the shared memory file to the given length
+        if (ftruncate(new_shared_memory.fd, (off_t)size) == -1) {
+            perror("ftruncate");
+            exit(EXIT_FAILURE);
+        }
     }
     // map a file to memory
     if (
@@ -35,7 +35,7 @@ shared_memory get_shared_memory_segment(char *path, size_t size) {
             MAP_SHARED,             // segment type
             new_shared_memory.fd,
             0                       // projection offset
-        )) != EXIT_SUCCESS
+        )) == MAP_FAILED
     ) {
         perror("mmap");
         exit(EXIT_FAILURE);
@@ -46,11 +46,11 @@ shared_memory get_shared_memory_segment(char *path, size_t size) {
 }
 
 int close_shared_memory(shared_memory sm) {
-    if (munmap(sm.mem_ptr, sm.size) != EXIT_SUCCESS) {
+    if (munmap(sm.mem_ptr, sm.size) == -1) {
         perror("munmap");
         return EXIT_FAILURE;
     }
-    if (close(sm.fd) != EXIT_FAILURE) {
+    if (close(sm.fd) == -1) {
         perror("close");
         return EXIT_FAILURE;
     }
