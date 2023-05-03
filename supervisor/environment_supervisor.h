@@ -5,9 +5,14 @@
 #ifndef OPERATING_SYSTEM_IPC_AND_SYNCHRONISATION_ENVIRONMENT_SUPERVISOR_H
 #define OPERATING_SYSTEM_IPC_AND_SYNCHRONISATION_ENVIRONMENT_SUPERVISOR_H
 
-#define NO_WIND         0.0
-#define SMALL_WIND      0.4
-#define MEDIUM_WIND     1.5
-#define STRONG_WIND     2.5
+#include <sys/types.h>
+#include <sys/semaphore.h>
+#include <signal.h>
+
+#include "../util.h"
+#include "../IPC/ipc.h"
+#include "../process/handling.h"
+
+pid_t start_environment_supervisor(Parameters *p);
 
 #endif //OPERATING_SYSTEM_IPC_AND_SYNCHRONISATION_ENVIRONMENT_SUPERVISOR_H

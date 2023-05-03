@@ -6,7 +6,7 @@
 #define OPERATING_SYSTEM_IPC_AND_SYNCHRONISATION_UTIL_H
 
 #define PARAM_PATH      "/calembredaine"
-#define MUTEX_NAME      "/vent-sem"
+#define MUTEX_NAME      "/vent-sem_environment"
 #define NB_PARTICLES    1000
 #define PI              3.14159
 
@@ -14,6 +14,11 @@
 #define DISTANCE_MAX    15
 #define PARTICLE_MASS   1
 #define DELTA_T         0.01
+
+#define NO_WIND         0.0
+#define SMALL_WIND      0.4
+#define MEDIUM_WIND     1.5
+#define STRONG_WIND     2.5
 
 typedef struct {
     float x;
