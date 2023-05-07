@@ -15,10 +15,10 @@ int main() {
     Parameters *p = (Parameters*)sm.mem_ptr;
     pid_t camera = start_camera_supervisor(p);
     pid_t environment = start_environment_supervisor(p);
+    printf("Camera supervisor PID: %d\n", camera);
+    printf("Environment supervisor PID: %d\n", environment);
 
     sleep(30);
-    kill(camera, SIGALRM);
-    kill(environment, SIGALRM);
 
     close_shared_memory(sm);
     return 0;
