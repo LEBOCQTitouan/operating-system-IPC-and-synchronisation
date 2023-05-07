@@ -4,35 +4,35 @@
 
 #include "camera_supervisor.h"
 
-sem_t *sem_camera;
-
-void camera_handler(int sig) {
-    sem_close(sem_camera);
-    exit(EXIT_SUCCESS);
+void turn_camera(Parameters *p, int angle) {
+    p->theta = angle;
 }
 
-void camera_routine(routine_parameter_t p) {
-    struct sigaction sa = {0};
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler = camera_handler;
-    if (sigaction(SIGALRM, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
-    sa.sa_flags = 0;
+void change_distance(Parameters *p, float distance) {
+    p->distance = distance;
+}
 
+void turn_routine(routine_parameter_t p) {
+    sem_t *sem = get_semaphore(MUTEX_NAME);
     while (1) {
-        sem_wait(sem_camera);
-        p.p->theta++;
-        sem_post(sem_camera);
+        sem_wait(sem);
+        turn_camera(p.p, p.p->theta+1);
+        sem_post(sem);
         usleep(5000);
     }
 }
 
+void random_distance_routine(routine_parameter_t p) {
+    // TODO but cant find correct values
+}
+
+void camera_routine(routine_parameter_t p) {
+    create_child_process(turn_routine, p);
+    create_child_process(random_distance_routine, p);
+}
+
 pid_t start_camera_supervisor(Parameters *p) {
-    sem_camera = get_semaphore(MUTEX_NAME);
     routine_parameter_t parameter = {0};
-    parameter.sem = sem_camera;
     parameter.p = p;
     return create_child_process(camera_routine, parameter);
 }

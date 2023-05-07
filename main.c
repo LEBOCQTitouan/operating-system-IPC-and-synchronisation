@@ -9,6 +9,9 @@ int main() {
     shared_memory sm;
     sm = get_shared_memory_segment(PARAM_PATH, sizeof(Parameters));
 
+    sem_t *sem = get_semaphore(MUTEX_NAME);
+    sem_post(sem); // initialize semaphore for this manager
+
     Parameters *p = (Parameters*)sm.mem_ptr;
     pid_t camera = start_camera_supervisor(p);
     pid_t environment = start_environment_supervisor(p);

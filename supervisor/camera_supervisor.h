@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/semaphore.h>
 #include <signal.h>
+#include <time.h>
 
 #include "../util.h"
 #include "../IPC/ipc.h"
