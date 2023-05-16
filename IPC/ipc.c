@@ -21,6 +21,7 @@ shared_memory get_shared_memory_segment(char *path, size_t size) {
         }
     } else {
         // set the size of the shared memory file to the given length
+        new_shared_memory.fd = shm_open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
         if (ftruncate(new_shared_memory.fd, (off_t)size) == -1) {
             perror("ftruncate");
             exit(EXIT_FAILURE);
